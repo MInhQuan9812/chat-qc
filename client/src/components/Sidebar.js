@@ -58,6 +58,9 @@ const Sidebar = () => {
         dispatch(logout())
         navigate("/email")
         localStorage.clear()
+        localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
+        window.location.reload(true);
     }
   return (
     <div className='w-full h-full grid grid-cols-[48px,1fr] bg-white'>

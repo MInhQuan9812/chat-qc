@@ -18,13 +18,13 @@ const router = createBrowserRouter([
         children:[
             {
                 path:"register",
-                element: <AuthLayouts><Register/></AuthLayouts>
+                element: <Register/>
             },{
                 path:"email",
-                element:<AuthLayouts><CheckEmail/></AuthLayouts>
+                element:<CheckEmail/>
             },{
                 path:'password',
-                element:<AuthLayouts><CheckPassword/></AuthLayouts>
+                element:<CheckPassword/>
             },{
                 path:"",
                 element:<AuthLayouts><Home/></AuthLayouts>,

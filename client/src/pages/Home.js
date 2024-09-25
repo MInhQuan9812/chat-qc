@@ -1,17 +1,20 @@
 import React from "react";
 import { logout, setOnlineUser, setSocketConnection, setUser } from "../redux/userSlice";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { io } from "socket.io-client";
+import  io  from "socket.io-client";
 import axios from 'axios'
 import Sidebar from "../components/Sidebar";
 
 const Home = () => {
+  const user=useSelector(state=>state.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
+
+  console.log(user)
   const fetchUserDetails = async () => {
     try {
       const URL = `${process.env.REACT_APP_BACKEND_URL}/api/user-detail`;
@@ -36,19 +39,24 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    const socketConnection = io(process.env.REACT_APP_BACKEND_URL, {
-      auth: {
-        token: localStorage.getItem("token"),
-      },
-    });
+    const socketConnection = io(process.env.REACT_APP_BACKEND_URL,{
+      auth : {
+        token : localStorage.getItem('token')
+      }});
 
-    socketConnection.on("onlineUser", (data) => {
+    socketConnection.on('onlineUser', (data) => {
       console.log(data);
       dispatch(setOnlineUser(data));
     });
 
-    dispatch(setSocketConnection(socketConnection))
+    // dispatch(setSocketConnection(socketConnection))
+    // socketConnection.on('connect', () => {
+    //   console.log('Socket connected:', socketConnection.id);
+    // });
 
+    // socketConnection.on('connect_error', (error) => {
+    //   console.error('Socket connection error:', error);
+    // });
     return()=>{
       socketConnection.disconnect()
     }
