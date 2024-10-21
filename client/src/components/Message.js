@@ -4,14 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import { FaAngleLeft } from "react-icons/fa6";
 import Avatar from "./Avatar";
 import { HiDotsVertical } from "react-icons/hi";
-import backgroundImage from "../assets/81r1WXSNqBL._AC_UF10001000_QL80_.jpg";
+import backgroundImage from "../assets/ferrariandmen.webp";
 import { FaPlus } from "react-icons/fa6";
 import { FaImage } from "react-icons/fa6";
 import { FaVideo } from "react-icons/fa6";
 import uploadFile from "../helpers/uploadFile";
 import { IoMdSend } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-import Loading from './Loading';
+import Loading from "./Loading";
+import moment from "moment";
 
 const Message = () => {
   const params = useParams();
@@ -24,6 +25,7 @@ const Message = () => {
     email: "",
     profile_pic: "",
     online: false,
+    _id: "",
   });
 
   const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
@@ -50,22 +52,6 @@ const Message = () => {
     setOpenImageVideoUpload((preve) => !preve);
   };
 
-  useEffect(() => {
-    if (socketConnection) {
-      socketConnection.emit("message-page", params.userId);
-
-      socketConnection.on("message-user", (data) => {
-        setDataUser(data);
-        console.log("user details", data);
-      });
-    }
-
-    socketConnection.on('message',(data)=>{
-      console.log('message data ',data)
-      setAllMessage(data)
-    })
-  }, [socketConnection, params?.userId, user]);
-
   const handleUploadImage = async (e) => {
     const file = e.target.files[0];
 
@@ -82,14 +68,14 @@ const Message = () => {
     });
   };
 
-  const handleClearUploadVideo = ()=>{
-    setMessage(preve => {
-      return{
+  const handleClearUploadVideo = () => {
+    setMessage((preve) => {
+      return {
         ...preve,
-        videoUrl : ""
-      }
-    })
-  }
+        videoUrl: "",
+      };
+    });
+  };
 
   const handleClearUploadImage = () => {
     setMessage((preve) => {
@@ -100,7 +86,14 @@ const Message = () => {
     });
   };
 
-  const handleUploadVideo = () => {
+  const handleUploadVideo = async (e) => {
+    const file = e.target.files[0];
+
+    setLoading(true);
+    const uploadPhoto = await uploadFile(file);
+    setLoading(false);
+    setOpenImageVideoUpload(false);
+
     setMessage((preve) => {
       return {
         ...preve,
@@ -108,6 +101,23 @@ const Message = () => {
       };
     });
   };
+
+  useEffect(() => {
+    if (socketConnection) {
+      socketConnection.emit("message-page", params.userId);
+
+      socketConnection.emit("seen", params.userId);
+      socketConnection.on("message-user", (data) => {
+        setDataUser(data);
+        console.log("user details", data);
+      });
+    }
+
+    socketConnection.on("message", (data) => {
+      console.log("message data ", data);
+      setAllMessage(data);
+    });
+  }, [socketConnection, params?.userId, user]);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -118,31 +128,32 @@ const Message = () => {
       };
     });
   };
-  const handleSendMessage=(e)=>{
-    e.preventDefault()
-    console.log(message.text)
-    if(message.text || message.imageUrl || message.videoUrl){
-      if(socketConnection){
-        socketConnection.emit('new-message',{
-          sender:user?._id,
-          receiver:params.userId,
-          text:message.text,
-          imageUrl:message.imageUrl,
-          videoUrl:message.videoUrl,
-          msgByUserId:user?._id
-        })
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (message.text || message.imageUrl || message.videoUrl) {
+      if (socketConnection) {
+        socketConnection.emit("new-message", {
+          sender: user?._id,
+          receiver: params.userId,
+          text: message.text,
+          imageUrl: message.imageUrl,
+          videoUrl: message.videoUrl,
+          msgByUserId: user?._id,
+        });
         setMessage({
-          text:"",
-          imageUrl:"",
-          videoUrl:""
-        })
+          text: "",
+          imageUrl: "",
+          videoUrl: "",
+        });
       }
     }
-  }
+  };
   return (
     <div
-      style={{ backgroundImage: `url(${backgroundImage})` }}
-      className="bg-no-repeat bg-cover"
+    style={{ backgroundImage: `url(${backgroundImage})` }}
+    className="bg-no-repeat bg-cover"
     >
       <header className="sticky top-0 h-16 bg-white flex justify-between items-center px-4">
         <div className="flex items-center gap-4">
@@ -179,7 +190,10 @@ const Message = () => {
         </div>
       </header>
 
-      <section className="h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-50">
+      {/***show all message */}
+      <section
+        className='h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-50'
+      >
         {/**all message show here */}
         <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
           {allMessage.map((msg, index) => {
@@ -207,58 +221,62 @@ const Message = () => {
                   )}
                 </div>
                 <p className="px-2">{msg.text}</p>
-                <p className="text-xs ml-auto w-fit">Date Time</p>
+                <p className="text-xs ml-auto w-fit">
+                  {moment(msg.createdAt).format("hh:mm")}
+                </p>
               </div>
             );
           })}
         </div>
-         {/**upload Image display */}
-         {
-                    message.imageUrl && (
-                      <div className='w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
-                        <div className='w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600' onClick={handleClearUploadImage}>
-                            <IoClose size={30}/>
-                        </div>
-                        <div className='bg-white p-3'>
-                            <img
-                              src={message.imageUrl}
-                              alt='uploadImage'
-                              className='aspect-square w-full h-full max-w-sm m-2 object-scale-down'
-                            />
-                        </div>
-                      </div>
-                    )
-                  }
 
-                  {/**upload video display */}
-                  {
-                    message.videoUrl && (
-                      <div className='w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
-                        <div className='w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600' onClick={handleClearUploadVideo}>
-                            <IoClose size={30}/>
-                        </div>
-                        <div className='bg-white p-3'>
-                            <video 
-                              src={message.videoUrl} 
-                              className='aspect-square w-full h-full max-w-sm m-2 object-scale-down'
-                              controls
-                              muted
-                              autoPlay
-                            />
-                        </div>
-                      </div>
-                    )
-                  }
+        {/**upload Image display */}
+        {message.imageUrl && (
+          <div className="w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden">
+            <div
+              className="w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600"
+              onClick={handleClearUploadImage}
+            >
+              <IoClose size={30} />
+            </div>
+            <div className="bg-white p-3">
+              <img
+                src={message.imageUrl}
+                alt="uploadImage"
+                className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
+              />
+            </div>
+          </div>
+        )}
 
-                  {
-                    loading && (
-                      <div className='w-full h-full flex sticky bottom-0 justify-center items-center'>
-                        <Loading/>
-                      </div>
-                    )
-                  }
+        {/**upload video display */}
+        {message.videoUrl && (
+          <div className="w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden">
+            <div
+              className="w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600"
+              onClick={handleClearUploadVideo}
+            >
+              <IoClose size={30} />
+            </div>
+            <div className="bg-white p-3">
+              <video
+                src={message.videoUrl}
+                className="aspect-square w-full h-full max-w-sm m-2 object-scale-down"
+                controls
+                muted
+                autoPlay
+              />
+            </div>
+          </div>
+        )}
+
+        {loading && (
+          <div className="w-full h-full flex sticky bottom-0 justify-center items-center">
+            <Loading />
+          </div>
+        )}
       </section>
 
+      {/**send message */}
       <section className="h-16 bg-white flex items-center px-4">
         <div className="relative ">
           <button
@@ -311,7 +329,6 @@ const Message = () => {
 
         {/**input box */}
         <form className="h-full w-full flex gap-2" onSubmit={handleSendMessage}>
-          {/* onSubmit={handleSendMessage} */}
           <input
             type="text"
             placeholder="Type here message..."

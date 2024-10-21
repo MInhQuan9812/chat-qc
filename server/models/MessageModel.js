@@ -3,7 +3,7 @@ const mongoose=require('mongoose')
 const messageSchema=new mongoose.Schema({
     text:{
         type:String,
-        default:""
+        default:"",
     },
     imageUrl:{
         type:String,
@@ -16,10 +16,16 @@ const messageSchema=new mongoose.Schema({
     seen:{
         type:Boolean,
         default:false
+    },
+    msgByUserId:{
+        type:mongoose.Schema.ObjectId,
+        required:true,
+        ref:'User'
     }
 },{
-    timestamps:true
+ timestamps:true
 })
+
 const MessageModel = mongoose.model('Message',messageSchema)
 
 module.exports={

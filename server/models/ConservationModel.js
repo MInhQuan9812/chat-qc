@@ -1,5 +1,6 @@
 const mongoose=require('mongoose')
 
+
 const conversationSchema=new mongoose.Schema({
     sender:{
         type:mongoose.Schema.ObjectId,
@@ -20,7 +21,6 @@ const conversationSchema=new mongoose.Schema({
 },{
     timestamps:true
 })
-
 const ConservationModel = mongoose.model('Conversation',conversationSchema)
 
 module.exports={
