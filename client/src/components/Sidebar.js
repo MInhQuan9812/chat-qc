@@ -21,7 +21,7 @@ const Sidebar = () => {
     const socketConnection = useSelector(state => state?.user?.socketConnection)
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
+    // console.log(socketConnection)
     useEffect(()=>{
         if(socketConnection){
             socketConnection.emit('sidebar',user._id)

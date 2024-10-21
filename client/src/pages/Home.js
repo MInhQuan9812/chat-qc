@@ -14,7 +14,7 @@ const Home = () => {
   const location = useLocation();
 
 
-  console.log(user)
+  // console.log(user)
   const fetchUserDetails = async () => {
     try {
       const URL = `${process.env.REACT_APP_BACKEND_URL}/api/user-detail`;
@@ -43,11 +43,14 @@ const Home = () => {
       auth : {
         token : localStorage.getItem('token')
       }});
-
+      
+      console.log(socketConnection)
     socketConnection.on('onlineUser', (data) => {
       console.log(data);
       dispatch(setOnlineUser(data));
     });
+    
+    dispatch(setSocketConnection(socketConnection))
 
     // dispatch(setSocketConnection(socketConnection))
     // socketConnection.on('connect', () => {
