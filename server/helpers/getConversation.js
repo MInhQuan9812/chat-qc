@@ -6,10 +6,18 @@ const getConversation = async (currentUserId) => {
       $or: [{ sender: currentUserId }, { receiver: currentUserId }],
     })
       .sort({ updatedAt: -1 })
-      .populate("messages")
-      .populate("sender")
-      .populate("receiver");
-
+      .populate({
+        path: "messages",
+        select: "-password", // Loại trừ trường password
+      })
+      .populate({
+        path: "sender",
+        select: "-password", // Loại trừ trường password của sender
+      })
+      .populate({
+        path: "receiver",
+        select: "-password", // Loại trừ trường password của receiver
+      });
     const conversation = currentUserConversation.map((conv) => {
       const countUnseenMsg = conv?.messages?.reduce((preve, curr) => {
         const msgByUserId = curr?.msgByUserId?.toString();

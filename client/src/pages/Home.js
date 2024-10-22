@@ -13,8 +13,6 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-
-  // console.log(user)
   const fetchUserDetails = async () => {
     try {
       const URL = `${process.env.REACT_APP_BACKEND_URL}/api/user-detail`;
@@ -22,7 +20,7 @@ const Home = () => {
         url: URL,
         withCredentials: true,
       });
-
+      
       dispatch(setUser(response.data.data));
 
       if (response.data.data.logout) {
@@ -44,22 +42,14 @@ const Home = () => {
         token : localStorage.getItem('token')
       }});
       
-      console.log(socketConnection)
+      // console.log(socketConnection)
     socketConnection.on('onlineUser', (data) => {
-      console.log(data);
+      // console.log(data);
       dispatch(setOnlineUser(data));
     });
     
     dispatch(setSocketConnection(socketConnection))
 
-    // dispatch(setSocketConnection(socketConnection))
-    // socketConnection.on('connect', () => {
-    //   console.log('Socket connected:', socketConnection.id);
-    // });
-
-    // socketConnection.on('connect_error', (error) => {
-    //   console.error('Socket connection error:', error);
-    // });
     return()=>{
       socketConnection.disconnect()
     }
@@ -72,7 +62,6 @@ const Home = () => {
     <div className="grid lg:grid-cols-[300px,1fr] h-screen max-h-screen">
       <section className={`bg-white ${!basePath && "hidden"} lg:block`}>
         <Sidebar />
-
       </section>
 
       {/**message component**/}
