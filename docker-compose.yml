@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  client:
+    container_name: supportClient
+    build:
+      context: ./client
+    ports:
+    - "3000:80"
+    - "3001:443"
+    networks:
+      - app-network
+    depends_on:
+      - server
+
+  server:
+    container_name: supportServer
+    build:
+      context: ./server
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      - MONGODB_URI=${MONGODB_URL}  # Sử dụng biến môi trường từ file .env
+      - PORT=8080
+
+networks:
+  app-network:
+    driver: bridge

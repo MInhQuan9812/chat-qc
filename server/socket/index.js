@@ -132,13 +132,14 @@ io.on("connection", async (socket) => {
 
     const conversationSender = await getConversation(user?._id?.toString())
     const conversationReceiver = await getConversation(msgByUserId)
-    
+
     io.to(user?._id?.toString()).emit("conversation", conversationSender);
     io.to(msgByUserId).emit("conversation", conversationReceiver);
 
    
   });
   socket.on("disconnect", () => {
+    onlineUser.delete(user?._id?.toString())
     console.log("User disconnected:", socket.id);
   });
 });
