@@ -23,7 +23,7 @@ app.get('/',(request,response)=>{
 })
 
 //api endpoints
-app.use('/api',router)
+app.use('/',router)
 
 connectDB().then(()=>{
     server.listen(PORT,()=>{
