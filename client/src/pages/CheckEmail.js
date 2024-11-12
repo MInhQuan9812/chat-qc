@@ -29,7 +29,7 @@ const CheckEmail = () => {
     e.preventDefault()
     e.stopPropagation()
 
-    const URL = `${process.env.REACT_APP_BACKEND_URL}/api/email`
+    const URL = `${process.env.REACT_APP_BACKEND_URL}/email`
 
     try{
       const response=await axios.post(URL,data)

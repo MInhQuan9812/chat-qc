@@ -38,7 +38,7 @@ const CheckPassword = () => {
   const handleSubmit= async(e) =>{
     e.preventDefault()
     e.stopPropagation()
-    const URL = `${process.env.REACT_APP_BACKEND_URL}/api/password`
+    const URL = `${process.env.REACT_APP_BACKEND_URL}/password`
     try{
       const response=await axios({
         method:'post',

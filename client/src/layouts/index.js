@@ -16,7 +16,7 @@ const AuthLayouts = ({ children }) => {
 
   const verifyToken = async (token) => {
     try {
-      const URL = `${process.env.REACT_APP_BACKEND_URL}/api/verify-token`;
+      const URL = `${process.env.REACT_APP_BACKEND_URL}/verify-token`;
       const response = await axios.post({
         url: URL,
         withCredentials: true,
